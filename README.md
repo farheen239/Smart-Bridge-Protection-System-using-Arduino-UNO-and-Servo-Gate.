@@ -1,1 +1,1 @@
-# Smart-Bridge-Protection-System-using-Arduino-UNO-and-Servo-Gate.
+This project uses an Arduino UNO to control a smart protection system for bridges. An ultrasonic sensor is used to detect the height of approaching vehicles. If the truck is taller than the safe limit, the servo motor-controlled gate will automatically close to stop entry. If the height is within the allowed range, the gate will open and allow the vehicle to pass. This system helps prevent damage to bridges by blocking oversized vehicles.
