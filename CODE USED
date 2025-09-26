@@ -1,0 +1,76 @@
+CODE USED //
+#include <Servo.h>
+
+// Pin config
+const int trigPin = 9;
+const int echoPin = 10;
+const int ledPin = 7;
+const int servoPin = 6;
+
+long duration;
+int distance;
+Servo myServo;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+
+  myServo.attach(servoPin);
+  myServo.write(0);  // Gate closed at start
+  digitalWrite(ledPin, LOW);
+
+  Serial.begin(9600);
+}
+
+// Function to measure distance (average of 5 readings)
+int getDistance() {
+  long sum = 0;
+  for (int i = 0; i < 5; i++) {
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    duration = pulseIn(echoPin, HIGH, 20000); // timeout 20ms
+    int d = duration * 0.034 / 2;
+
+    if (d > 0 && d < 30) { // valid range
+      sum += d;
+    }
+    delay(10);
+  }
+  return sum / 5;
+}
+
+void loop() {
+  distance = getDistance();
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Logic
+  if (distance > 3 && distance < 6) {
+    // Truck safe → Open gate, blink LED green
+    myServo.write(90);
+    digitalWrite(ledPin, HIGH);
+    delay(300);
+    digitalWrite(ledPin, LOW);
+    delay(300);
+  }
+  else if (distance <= 3 && distance > 0) {
+    // Truck overloaded → Close gate, LED off
+    myServo.write(0);
+    digitalWrite(ledPin, LOW);
+    delay(500); // stabilization
+  }
+  else {
+    // No vehicle → Keep gate closed
+    myServo.write(0);
+    digitalWrite(ledPin, LOW);
+    delay(200);
+  }
+}
